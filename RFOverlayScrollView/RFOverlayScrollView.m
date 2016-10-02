@@ -44,19 +44,19 @@ static NSComparisonResult scrollerAboveSiblingViewsComparator(NSView *view1, NSV
     // Fake zero scroller width so the contentView gets drawn to the edge
     method_exchangeImplementations(class_getClassMethod([RFOverlayScroller class], @selector(scrollerWidthForControlSize:scrollerStyle:)),
                                    class_getClassMethod([RFOverlayScroller class], @selector(zeroWidth)));
-	[super tile];
+    [super tile];
     // Restore original scroller width
     method_exchangeImplementations(class_getClassMethod([RFOverlayScroller class], @selector(scrollerWidthForControlSize:scrollerStyle:)),
                                    class_getClassMethod([RFOverlayScroller class], @selector(zeroWidth)));
     
     // Resize vertical scroller
     CGFloat width = [RFOverlayScroller scrollerWidthForControlSize:self.verticalScroller.controlSize
-                                                         scrollerStyle:self.verticalScroller.scrollerStyle];
-	[self.verticalScroller setFrame:(NSRect){
+                                                     scrollerStyle:self.verticalScroller.scrollerStyle];
+    [self.verticalScroller setFrame:(NSRect){
         self.bounds.size.width - width,
-        self.headerOffset,
+        self.headerOffset + self.scrollerInsets.top,
         width,
-        self.bounds.size.height - self.headerOffset
+        self.bounds.size.height - self.headerOffset - self.scrollerInsets.bottom
     }];
     
     // Move scroller to front
@@ -70,14 +70,15 @@ static NSComparisonResult scrollerAboveSiblingViewsComparator(NSView *view1, NSV
     {
         if ([subView isKindOfClass:[NSClipView class]])
         {   for (NSView *subView2 in [subView subviews])
-            {   if ([subView2 isKindOfClass:[NSTableView class]])
-                {
-                    return [(NSTableView *)subView2 headerView].frame.size.height;
-                }
-            }
+        {   if ([subView2 isKindOfClass:[NSTableView class]])
+        {
+            return [(NSTableView *)subView2 headerView].frame.size.height;
+        }
+        }
         }
     }
     return 0;
 }
 
 @end
+
